@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 public final class ChatUi {
+    private static final long CATCH_UP_MIN_ADVANCE_MS = 1000;
+    private static final long CATCH_UP_COOLDOWN_MS = 5000;
     static int dragPercent = -1;
     private static WeakReference<Activity> activity = new WeakReference<>(null);
     private static WeakReference<Object> coordinates = new WeakReference<>(null);
@@ -26,6 +29,8 @@ public final class ChatUi {
     private static Object positionCallback;
     private static WeakReference<Object> clickOwner = new WeakReference<>(null);
     private static Object liveClick;
+    private static WeakReference<Object> rewindOwner = new WeakReference<>(null);
+    private static Object backClick;
     private static Object menuClick;
 
     private ChatUi() {}
@@ -48,13 +53,18 @@ public final class ChatUi {
     public static void appendDevice(Object builder, Map<?, ?> inline, int device, long size) {}
     public static Object resizeModifier(Object modifier) { return modifier; }
     public static float[] chatBounds(Object coordinates) { return null; }
-    public static boolean seekToLive(Object viewModel) { return false; }
+    public static int seekToLive(Object viewModel) { return 0; }
+    public static int seekBack(Object viewModel) { return 0; }
+    public static void renderRewind(Object viewModel, Object composer) {}
     public static void renderCatchUp(Object viewModel, Object composer) {}
     public static void addPlayerSettings(List<?> items) {}
 
-    public static int catchUpIcon() {
+    public static int catchUpIcon() { return icon("s_chzzk_live_catchup"); }
+    public static int rewindIcon() { return icon("s_chzzk_live_rewind"); }
+
+    private static int icon(String name) {
         Activity host = activity.get();
-        return host == null ? 0 : host.getResources().getIdentifier("s_chzzk_live_catchup", "drawable", host.getPackageName());
+        return host == null ? 0 : host.getResources().getIdentifier(name, "drawable", host.getPackageName());
     }
 
     public static Object playerSettingsClick() {
@@ -91,23 +101,66 @@ public final class ChatUi {
     public static String nicknameText(String value) { return ChzzkSettings.enabled("hide_nickname") ? "" : value; }
     public static Object subscriptionBadge(Object value) { return ChzzkSettings.enabled("hide_subscription_badge") ? null : value; }
     public static Object donationBadge(Object value) { return ChzzkSettings.enabled("hide_donation_badge") ? null : value; }
-    public static List<?> activityBadges(List<?> value) { return ChzzkSettings.enabled("hide_activity_badge") ? null : value; }
+    public static List<?> activityBadges(List<?> value) { return ChzzkSettings.enabled("hide_activity_badge") ? java.util.Collections.emptyList() : value; }
     public static boolean verifiedBadge(boolean value) { return value && !ChzzkSettings.enabled("hide_verified_badge"); }
+    public static Object verifiedMark(Object value) { return ChzzkSettings.enabled("hide_verified_badge") ? null : value; }
     public static Object channelBadges(Object value) { return ChzzkSettings.enabled("hide_channel_badge") ? null : value; }
     public static boolean hideClip() { return ChzzkSettings.enabled("hide_clip_button"); }
     public static boolean hideCast() { return ChzzkSettings.enabled("hide_cast_button"); }
     public static boolean hideShare() { return ChzzkSettings.enabled("hide_share_button"); }
     public static boolean showCatchUp() { return ChzzkSettings.enabledByDefault("live_catch_up"); }
 
+    public static boolean showRewind() { return ChzzkSettings.enabledByDefault("live_rewind"); }
+    public static boolean showChatProfileButton() { return ChzzkSettings.enabledByDefault("chat_profile_button"); }
+    public static boolean showChatEmojiButton() { return ChzzkSettings.enabledByDefault("chat_emoji_button"); }
+    public static boolean showChatDonationButton(boolean available) {
+        return available && ChzzkSettings.enabledByDefault("chat_donation_button");
+    }
+
+    public static long catchUpPosition(long current, long duration) {
+        if (current < 0 || duration <= 0 || duration == Long.MAX_VALUE || current > duration) return -1;
+        long bufferMs = Math.max(1, Math.min(10, ChzzkSettings.number("live_catch_up_buffer_seconds", 3))) * 1000L;
+        long target = duration - bufferMs;
+        return target - current >= CATCH_UP_MIN_ADVANCE_MS ? target : -2;
+    }
+
+    public static long rewindPosition(long current, long duration) {
+        if (current < 0 || duration <= 0 || duration == Long.MAX_VALUE || current > duration) return -1;
+        if (current == 0) return -2;
+        int seconds = Math.max(5, Math.min(60, ChzzkSettings.number("live_rewind_seconds", 5))) / 5 * 5;
+        return Math.max(0, current - seconds * 1000L);
+    }
+
+    public static Object rewindClick(Object viewModel) {
+        if (rewindOwner.get() == viewModel && backClick != null) return backClick;
+        WeakReference<Object> owner = new WeakReference<>(viewModel);
+        rewindOwner = owner;
+        backClick = callback("kotlin.jvm.functions.Function0", args -> {
+            Activity host = activity.get();
+            Object player = owner.get();
+            int result = player == null ? 0 : seekBack(player);
+            String message = result == 1 ? "이전 위치로 이동 중입니다"
+                : result == 2 ? "더 이전으로 이동할 수 없습니다" : "지금은 되감기를 사용할 수 없습니다";
+            if (host != null) Toast.makeText(host, message, Toast.LENGTH_SHORT).show();
+        });
+        return backClick;
+    }
+
     public static Object catchUpClick(Object viewModel) {
         if (clickOwner.get() == viewModel && liveClick != null) return liveClick;
         WeakReference<Object> owner = new WeakReference<>(viewModel);
+        long[] lastRequest = {-1};
         clickOwner = owner;
         liveClick = callback("kotlin.jvm.functions.Function0", args -> {
+            long now = SystemClock.elapsedRealtime();
+            if (lastRequest[0] >= 0 && now - lastRequest[0] < CATCH_UP_COOLDOWN_MS) return;
             Activity host = activity.get();
             Object player = owner.get();
-            boolean moved = player != null && seekToLive(player);
-            if (host != null) Toast.makeText(host, moved ? "실시간 위치로 이동했습니다" : "실시간 이동을 사용할 수 없는 영상입니다", Toast.LENGTH_SHORT).show();
+            int result = player == null ? 0 : seekToLive(player);
+            if (result != 0) lastRequest[0] = now;
+            String message = result == 1 ? "실시간 위치로 이동 중입니다"
+                : result == 2 ? "이미 설정한 실시간 위치에 가깝습니다" : "지금은 실시간 이동을 사용할 수 없습니다";
+            if (host != null) Toast.makeText(host, message, Toast.LENGTH_SHORT).show();
         });
         return liveClick;
     }
@@ -168,7 +221,25 @@ public final class ChatUi {
 
         int dp(float value) { return Math.round(value * getResources().getDisplayMetrics().density); }
 
+        @Override protected void onDetachedFromWindow() {
+            removeCallbacks(this);
+            if (handle == this) {
+                handle = null;
+                coordinates.clear();
+                dragPercent = -1;
+            }
+            super.onDetachedFromWindow();
+        }
+
+        @Override protected void onWindowVisibilityChanged(int visibility) {
+            super.onWindowVisibilityChanged(visibility);
+            removeCallbacks(this);
+            if (visibility == VISIBLE) post(this);
+        }
+
         @Override public void run() {
+            removeCallbacks(this);
+            if (!isAttachedToWindow() || getWindowVisibility() != VISIBLE) return;
             Object position = coordinates.get();
             float[] bounds = position == null ? null : chatBounds(position);
             View root = host.getWindow().getDecorView();

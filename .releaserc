@@ -17,6 +17,11 @@
           },
           {
             "type": "feat",
+            "release": "patch"
+          },
+          {
+            "type": "feat",
+            "scope": "minor",
             "release": "minor"
           },
           {
@@ -36,34 +41,30 @@
       }
     ],
     [
-      "@semantic-release/release-notes-generator",
+      "./node_modules/@semantic-release/release-notes-generator/index.js",
       {
         "preset": "conventionalcommits",
         "presetConfig": {
           "types": [
             {
               "type": "fix",
-              "section": "🐛 Bug Fixes",
-              "hidden": false
+              "section": "🐛 Bug Fixes"
             },
             {
               "type": "feat",
-              "section": "✨ New Features",
-              "hidden": false
+              "section": "✨ New Features"
             },
             {
               "type": "bump",
-              "section": "🚀 Updated App Support",
-              "hidden": false
+              "section": "🚀 Updated App Support"
             },
             {
               "type": "perf",
-              "section": "🔧 Improvements",
-              "hidden": false
+              "section": "🔧 Improvements"
             },
             {
               "type": "build",
-              "hidden": true
+              "effect": "hidden"
             }
           ]
         }
@@ -107,18 +108,6 @@
           }
         ],
         "successComment": false
-      }
-    ],
-    [
-      "@cleyrop-org/semantic-release-backmerge",
-      {
-        "backmergeBranches": [
-          {
-            "from": "main",
-            "to": "dev"
-          }
-        ],
-        "clearWorkspace": true
       }
     ]
   ]
