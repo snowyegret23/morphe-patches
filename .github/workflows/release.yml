@@ -32,7 +32,42 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Verify release notes
+        id: release_tooling
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+          import { loadPlugin } from './node_modules/semantic-release/lib/plugins/utils.js';
+          import { analyzeCommits } from '@semantic-release/commit-analyzer';
+          const config = JSON.parse(fs.readFileSync('.releaserc', 'utf8'));
+          const plugin = name => config.plugins.find(value => Array.isArray(value) && value[0] === name)[1];
+          const logger = { log() {} };
+          const options = { repositoryUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}.git` };
+          const context = { cwd: process.cwd(), logger, options };
+          const notesSpec = config.plugins.find(value => Array.isArray(value) && value[0].includes('release-notes-generator'));
+          const { generateNotes } = await loadPlugin(context, notesSpec[0], {});
+          const cases = [['feat: feature', 'patch'], ['fix: bug', 'patch'], ['bump: support', 'patch'], ['perf: speed', 'patch'], ['feat(minor): feature', 'minor'], ['chore: maintenance', null]];
+          for (const [message, expected] of cases) {
+            assert.equal(await analyzeCommits(plugin('@semantic-release/commit-analyzer'), { ...context, commits: [{ message, hash: 'a'.repeat(40) }] }), expected);
+          }
+          const messages = ['feat: visible feature', 'fix: visible fix', 'bump: visible support', 'perf: visible speed', 'build: hidden build', 'chore: hidden maintenance'];
+          const notes = await generateNotes(notesSpec[1], {
+            ...context,
+            commits: messages.map((message, index) => ({ message, hash: String(index + 1).padStart(40, '0') })),
+            lastRelease: { gitTag: 'v0.0.1' },
+            nextRelease: { version: '0.0.2', gitTag: 'v0.0.2' }
+          });
+          for (const value of ['New Features', 'Bug Fixes', 'Updated App Support', 'Improvements', 'visible feature', 'visible fix', 'visible support', 'visible speed', 'compare/v0.0.1...v0.0.2']) assert.ok(notes.includes(value), value);
+          for (const value of ['hidden build', 'hidden maintenance', '{{', 'Missing helper']) assert.ok(!notes.includes(value), value);
+          if (process.env.GITHUB_OUTPUT) {
+            const version = JSON.parse(fs.readFileSync('node_modules/semantic-release/package.json', 'utf8')).version;
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `semantic_version=${version}\n`);
+          }
+          console.log('Release rules and release notes verified.');
+          JS
 
       - name: Prepare Gradle wrapper
         run: chmod +x gradlew
@@ -40,8 +75,10 @@ jobs:
       # Semantic release runs its own Gradle build command.
       # Only dev and main branch will generate a release as specified by .releaserc
       - name: Release
-        uses: cycjimmy/semantic-release-action@v6
+        uses: cycjimmy/semantic-release-action@v8.1.4
         id: release
+        with:
+          semantic_version: ${{ steps.release_tooling.outputs.semantic_version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -59,3 +96,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew clean :patches:buildAndroid --no-daemon
+
+      - name: Upload validation bundle
+        if: steps.release.outputs.new_release_published != 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: patches-validation
+          path: patches/build/libs/patches-*.mpp
+          if-no-files-found: error
+          retention-days: 7

@@ -1,3 +1,64 @@
+## [1.4.7](https://github.com/snowyegret23/morphe-patches/compare/v1.4.6...v1.4.7) (2026-11-02)
+
+### ✨ New Features
+
+* add experimental CHZZK Android TV customization ([f3ee87c](https://github.com/snowyegret23/morphe-patches/commit/f3ee87cc2784e9660b2197007f14e1a0a289fbfd))
+
+## [1.4.6](https://github.com/snowyegret23/morphe-patches/compare/v1.4.5...v1.4.6) (2026-10-29)
+
+### 🐛 Bug Fixes
+
+* refresh chat controls and prevent runtime library conflicts ([5b5ec02](https://github.com/snowyegret23/morphe-patches/commit/5b5ec02c7e9e48f5a988f3a11e24393e2261f5ef))
+
+## [1.4.5](https://github.com/snowyegret23/morphe-patches/compare/v1.4.4...v1.4.5) (2026-10-29)
+
+### 🐛 Bug Fixes
+
+* restore CHZZK 3.16.0 startup after APK signing ([737c35b](https://github.com/snowyegret23/morphe-patches/commit/737c35bdeff922b14551f533700d726992379c26))
+
+## [1.4.4](https://github.com/snowyegret23/morphe-patches/compare/v1.4.3...v1.4.4) (2026-10-29)
+
+### ✨ New Features
+
+* support CHZZK 3.16.0 with chat, seeking and audio controls ([e795d4a](https://github.com/snowyegret23/morphe-patches/commit/e795d4a928328cae45103f526af7652af06a7c70)), closes [#7](https://github.com/snowyegret23/morphe-patches/issues/7) [#8](https://github.com/snowyegret23/morphe-patches/issues/8)
+
+## [1.4.3](https://github.com/snowyegret23/morphe-patches/compare/v1.4.2...v1.4.3) (2026-10-22)
+
+### 🚀 Updated App Support
+
+* support CHZZK 3.15.2 alongside previous versions ([dc58a42](https://github.com/snowyegret23/morphe-patches/commit/dc58a427b25a44500f7257a83facff7ebe471be1))
+
+## [1.4.2](https://github.com/snowyegret23/morphe-patches/compare/v1.4.1...v1.4.2) (2026-10-19)
+
+### 🐛 Bug Fixes
+
+* keep Morphe settings visible when notifications are disabled ([e2535a2](https://github.com/snowyegret23/morphe-patches/commit/e2535a2407a308098eae6719fceab2756fa17249))
+
+## [1.4.1](https://github.com/snowyegret23/morphe-patches/compare/v1.4.0...v1.4.1) (2026-10-15)
+
+### ✨ New Features
+
+* support CHZZK 3.15.0 and add configurable viewer count ([2ccfb77](https://github.com/snowyegret23/morphe-patches/commit/2ccfb777bc797027cc0470ad5b3d2c53f3b84d4f))
+
+## [1.4.0](https://github.com/snowyegret23/morphe-patches/compare/v1.3.0...v1.4.0) (2026-10-14)
+
+### ✨ New Features
+
+* **minor:** improve live catch-up and add buffer controls ([d3a142a](https://github.com/snowyegret23/morphe-patches/commit/d3a142ad15387e08d96f0c5ded48175e770977fc))
+
+## 1.3.0 (2026-10-14)
+
+### 새 기능과 개선
+
+- 소리 평준화와 100–300% 추가 증폭을 추가했습니다. Morphe 설정의 ‘소리’에서 각각 켜고 조절할 수 있습니다.
+- 채팅 글자 크기와 소리 증폭 배율을 −/+ 버튼으로 5%씩 조절할 수 있습니다.
+
+## 1.2.0 (2026-10-12)
+
+### 지원 버전 추가
+
+- 치지직 3.14.10 지원을 추가했습니다. 기존 3.14.0도 계속 지원합니다.
+
 ## 1.1.2 (2026-10-05)
 
 ### 수정
@@ -23,8 +84,6 @@
 - 방송 화면의 ⋯ 메뉴에서 Morphe 설정을 열 수 있습니다.
 - 설정과 최근 채팅 화면을 새로 구성하고 설정 복사·붙여넣기를 지원합니다.
 - 7개 패치를 기본 선택합니다. 전문가 모드 없이 원본과 별도인 ‘치지직 S’로 설치됩니다.
-
-지원 앱은 치지직 3.14.0입니다. 휴대폰·태블릿 APKM의 패치 적용과 서명을 검증했고, 샤오신패드 Android 13에서 주요 기능을 확인했습니다.
 
 ## 1.0.0 (2026-10-05)
 

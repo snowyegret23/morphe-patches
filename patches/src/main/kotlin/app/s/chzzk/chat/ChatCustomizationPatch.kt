@@ -12,6 +12,7 @@ import app.s.chzzk.common.utils.parameterTypeNames
 import app.s.chzzk.common.utils.rewrite
 import app.s.chzzk.common.utils.smaliReference
 import app.s.chzzk.shared.Constants.COMPATIBILITY_CHZZK
+import app.s.chzzk.shared.nativeKeyboxPatch
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
@@ -53,16 +54,23 @@ private fun BytecodePatchContext.bridge(name: String, body: String) {
 val chatCustomizationPatch = bytecodePatch(
     name = "Chat customization",
     description = "Adds in-player Morphe settings, draggable chat width, chat styling, individual badge controls, " +
-        "device icons, live catch-up, player button visibility, recent chat and settings copy/paste.",
+        "device icons, chat input buttons, live viewer count, live rewind and catch-up, audio compression and volume boost, player button visibility, recent chat and settings copy/paste.",
 ) {
     compatibleWith(COMPATIBILITY_CHZZK)
+    dependsOn(nativeKeyboxPatch)
     extendWith("extensions/chzzk.mpe")
     dependsOn(playerResources)
 
     execute {
+        if (packageMetadata.versionName == "1.3.0") {
+            addTvCustomization()
+            return@execute
+        }
         addSettingsEntry()
         addChatUiHooks()
         addPlayerHooks()
+        addAudioHooks()
+        addViewerCountHooks()
         val stateFactory = classDefBy("Landroidx/compose/runtime/SnapshotStateKt;").methods.single {
             it.returnType == "Landroidx/compose/runtime/MutableState;" &&
                 it.parameterTypeNames == listOf("Ljava/lang/Object;")
@@ -163,6 +171,14 @@ val chatCustomizationPatch = bytecodePatch(
             method.addInstructions(superIndex + 1, "invoke-static/range {p0 .. p0}, $SETTINGS->attach(Landroid/app/Activity;)V")
         }
 
+        val widthOwners = when (packageMetadata.versionName) {
+            "3.14.0" -> setOf("Low0;", "Lzp0;")
+            "3.14.10" -> setOf("Lpw0;", "Laq0;")
+            "3.15.0" -> setOf("Lvx0;", "Lmm0;")
+            "3.15.2" -> setOf("Lvx0;", "Lnm0;")
+            "3.16.0" -> setOf("La01;", "Lvn0;")
+            else -> error("Unsupported CHZZK version: ${packageMetadata.versionName}")
+        }
         var widthMethods = 0
         var fontMethods = 0
         var messageRows = 0
@@ -173,7 +189,7 @@ val chatCustomizationPatch = bytecodePatch(
                         ?.containsAll(listOf(280f.toRawBits(), 350f.toRawBits())) == true
             }
             for (candidate in widthCandidates) {
-                check(original.type in listOf("Low0;", "Lzp0;")) { "Unexpected chat width owner: ${original.type}" }
+                check(original.type in widthOwners) { "Unexpected chat width owner: ${original.type}" }
                 val method = mutableClassDefBy(original).methods.single { it == candidate }
                 method.implementation!!.instructions.withIndex()
                     .filter { (it.value as? NarrowLiteralInstruction)?.narrowLiteral in listOf(280f.toRawBits(), 350f.toRawBits()) }
