@@ -170,8 +170,8 @@ importers:
   .:
     devDependencies:
       '@MorpheApp/changelog':
-        specifier: git+https://github.com/MorpheApp/changelog.git#caa1e931730f097bb6c4dee636b01c2c24ccd72d
-        version: https://codeload.github.com/MorpheApp/changelog/tar.gz/caa1e931730f097bb6c4dee636b01c2c24ccd72d(semantic-release@25.0.9(supports-color@7.2.0))
+        specifier: git+https://github.com/MorpheApp/changelog.git#f3d88b22e0276c44e76907bed292f3cdd96873f9
+        version: https://codeload.github.com/MorpheApp/changelog/tar.gz/f3d88b22e0276c44e76907bed292f3cdd96873f9(semantic-release@25.0.9(supports-color@7.2.0))
       '@cleyrop-org/semantic-release-backmerge':
         specifier: ^6.2.0
         version: 6.2.0(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
@@ -202,10 +202,10 @@ importers:
 
 packages:
 
-  '@MorpheApp/changelog@https://codeload.github.com/MorpheApp/changelog/tar.gz/caa1e931730f097bb6c4dee636b01c2c24ccd72d':
-    resolution: {gitHosted: true, integrity: sha512-6NSPnspL1nq1//wBKUPe6zAf2lOWgXtURPNaMTwzHCXhLemVDmZKqexgZTR8g+mgH00ZqhKjGPzeF67kea0RMA==, tarball: https://codeload.github.com/MorpheApp/changelog/tar.gz/caa1e931730f097bb6c4dee636b01c2c24ccd72d}
+  '@MorpheApp/changelog@https://codeload.github.com/MorpheApp/changelog/tar.gz/f3d88b22e0276c44e76907bed292f3cdd96873f9':
+    resolution: {gitHosted: true, integrity: sha512-dscGh08YLKEYdOm+A3Ofw+RUn+v8sh3V/IyruEQ5sMBRq/WwBCYKlFu2+O6xdG8Tw2/XfZt91hypJt8c8le7Lg==, tarball: https://codeload.github.com/MorpheApp/changelog/tar.gz/f3d88b22e0276c44e76907bed292f3cdd96873f9}
     version: 0.0.1
-    engines: {node: '>=14.17'}
+    engines: {node: '>=20.19'}
     peerDependencies:
       semantic-release: '>=18.0.0'
 
@@ -1331,12 +1331,10 @@ packages:
 
 snapshots:
 
-  '@MorpheApp/changelog@https://codeload.github.com/MorpheApp/changelog/tar.gz/caa1e931730f097bb6c4dee636b01c2c24ccd72d(semantic-release@25.0.9(supports-color@7.2.0))':
+  '@MorpheApp/changelog@https://codeload.github.com/MorpheApp/changelog/tar.gz/f3d88b22e0276c44e76907bed292f3cdd96873f9(semantic-release@25.0.9(supports-color@7.2.0))':
     dependencies:
       '@semantic-release/error': 4.0.0
-      aggregate-error: 5.0.0
       fs-extra: 11.4.1
-      lodash: 4.18.1
       semantic-release: 25.0.9(supports-color@7.2.0)
 
   '@babel/code-frame@7.29.7':
