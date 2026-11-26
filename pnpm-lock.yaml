@@ -170,8 +170,8 @@ importers:
   .:
     devDependencies:
       '@MorpheApp/changelog':
-        specifier: git+https://github.com/MorpheApp/changelog.git#f3d88b22e0276c44e76907bed292f3cdd96873f9
-        version: https://codeload.github.com/MorpheApp/changelog/tar.gz/f3d88b22e0276c44e76907bed292f3cdd96873f9(semantic-release@25.0.9(supports-color@7.2.0))
+        specifier: git+https://github.com/MorpheApp/changelog.git#bd1d5aab2a103879ddda6df6158deb6a9e7122ac
+        version: https://codeload.github.com/MorpheApp/changelog/tar.gz/bd1d5aab2a103879ddda6df6158deb6a9e7122ac(semantic-release@25.0.9(supports-color@7.2.0))
       '@cleyrop-org/semantic-release-backmerge':
         specifier: ^6.2.0
         version: 6.2.0(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
@@ -202,8 +202,8 @@ importers:
 
 packages:
 
-  '@MorpheApp/changelog@https://codeload.github.com/MorpheApp/changelog/tar.gz/f3d88b22e0276c44e76907bed292f3cdd96873f9':
-    resolution: {gitHosted: true, integrity: sha512-dscGh08YLKEYdOm+A3Ofw+RUn+v8sh3V/IyruEQ5sMBRq/WwBCYKlFu2+O6xdG8Tw2/XfZt91hypJt8c8le7Lg==, tarball: https://codeload.github.com/MorpheApp/changelog/tar.gz/f3d88b22e0276c44e76907bed292f3cdd96873f9}
+  '@MorpheApp/changelog@https://codeload.github.com/MorpheApp/changelog/tar.gz/bd1d5aab2a103879ddda6df6158deb6a9e7122ac':
+    resolution: {gitHosted: true, integrity: sha512-HBgIJdk4EXZ8f/GU0+ztvdTJ6C419xDlOmmJ5FQj1FZWEU8De7tWnI9bRbiqQ+b64GaEUDMtBwl/av2OKKtI6g==, tarball: https://codeload.github.com/MorpheApp/changelog/tar.gz/bd1d5aab2a103879ddda6df6158deb6a9e7122ac}
     version: 0.0.1
     engines: {node: '>=20.19'}
     peerDependencies:
@@ -1331,7 +1331,7 @@ packages:
 
 snapshots:
 
-  '@MorpheApp/changelog@https://codeload.github.com/MorpheApp/changelog/tar.gz/f3d88b22e0276c44e76907bed292f3cdd96873f9(semantic-release@25.0.9(supports-color@7.2.0))':
+  '@MorpheApp/changelog@https://codeload.github.com/MorpheApp/changelog/tar.gz/bd1d5aab2a103879ddda6df6158deb6a9e7122ac(semantic-release@25.0.9(supports-color@7.2.0))':
     dependencies:
       '@semantic-release/error': 4.0.0
       fs-extra: 11.4.1
